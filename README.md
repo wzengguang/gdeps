@@ -1,6 +1,6 @@
 # gdeps
 Get deps for substrate core project from net.             
-Get from "//redmond/exchange/Build/SUBSTRATE/LATEST/target/dev/" to "{your local}/src/target/dev/{project}".    
+Get from "\\redmond\exchange\Build\SUBSTRATE\LATEST\target\dev\{project dir}" to "{your local dir}/src/target/dev/{project}".    
 # Use
 * Add GDeps.exe direcotry to envirenment variable.
 * Open cmd, cd to your work project directory. The directory contains *.csproj file.
