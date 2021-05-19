@@ -2,10 +2,6 @@
 get deps for substrate core project from net 
 # use
 * Add GDeps.exe direcotry to envirenment variable.
-# gdeps
-get deps for substrate core project from net.
-# use
-* Add GDeps.exe directory to the environment variable.
 * Open cmd, cd to your work project directory. The directory contains *.csproj file.
 # command 
 ## gdeps  
