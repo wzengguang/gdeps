@@ -8,9 +8,15 @@ Auto get from "\\redmond\exchange\Build\SUBSTRATE\LATEST\target\dev\{project dir
 # Command 
 ## gdeps  
 default, not overrite and only target dll file.  
+
+## gdeps [target dll]
+example: gdeps Microsoft.Exchange.Data.dll       
+get only your specified dll. your csproj file must has it.    
 ## gdeps -o   
 get file overwrite your local file. 
 ## gdeps -a   
 get all files of target package. All files in target directory "debug/amd64/".  
+this command is very very slowly if there are many files.   
 ## gdeps -a -o   
+## gdeps [target dll] -a -o
 

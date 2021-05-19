@@ -18,14 +18,14 @@ namespace GDeps
 
         private string _targetRootPath;
 
+        private string _specifiedDll;
+
         private bool _override = false;
         private bool _getAll = false;
 
-        public SubstratePackage(string projectPath, bool[] args)
+        public SubstratePackage(string projectPath)
         {
             _projectPath = projectPath;
-            _override = args[0];
-            _getAll = args[1];
 
             var directoryInfo = new FileInfo(projectPath).Directory;
 
@@ -52,20 +52,75 @@ namespace GDeps
             _targetRootPath = _rootPath + "/target/dev";
         }
 
-        public async Task DoCopyFromRemoteAsync()
+        public async Task<bool> DoCopyFromRemoteAsync(string[] args)
         {
+            if (!CheckArgsIsValid(args))
+            {
+                return false;
+            }
+
             XmlDocument xml = new XmlDocument();
             xml.Load(_projectPath);
             var nodeList = xml.GetElementsByTagName("HintPath");
 
             List<string> paths = new List<string>();
+
             foreach (XmlNode item in nodeList)
             {
                 var path = ReplaceHintPath(item.InnerText);
-                paths.Add(path);
+                if (_specifiedDll == null || (_specifiedDll != null && path.Contains(_specifiedDll)))
+                {
+                    paths.Add(path);
+                }
+            }
+            if (paths.Count == 0 && _specifiedDll != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Not matched dll {_specifiedDll}, check your input.");
+                Console.ResetColor();
+
+                return false;
             }
 
             await Task.WhenAll(paths.Select(p => CopyReferenceFromRemoteIsNotExistAsync(p)));
+
+            return true;
+        }
+
+        private bool CheckArgsIsValid(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                var item = args[i];
+
+                switch (item)
+                {
+                    case "-o":
+                        _override = true;
+                        continue;
+                    case "-a":
+                        _getAll = true;
+                        continue;
+                    default:
+                        if (i == 0)
+                        {
+                            _specifiedDll = item;
+                            continue;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("args not correct!");
+                        Console.ResetColor();
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         private async Task CopyReferenceFromRemoteIsNotExistAsync(string filePath)

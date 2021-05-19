@@ -18,25 +18,24 @@ namespace GDeps
                 return;
             }
 
-            var checkArgs = CheckArgsIsValid(args);
-
-            if (checkArgs == null)
-            {
-                ConsoleHelp();
-                return;
-            }
-
             var dir = CheckWorkDirectory();
             if (dir != null)
             {
                 //StartGetDeps();
                 //StartRestore();
 
-                var work = new SubstratePackage(dir, checkArgs);
+                var work = new SubstratePackage(dir);
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("starting...");
                 Console.ResetColor();
-                await work.DoCopyFromRemoteAsync();
+
+                if (!await work.DoCopyFromRemoteAsync(args))
+                {
+                    ConsoleHelp();
+                    return;
+                }
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Completed");
                 Console.ResetColor();
@@ -45,36 +44,6 @@ namespace GDeps
             {
                 ConsoleHelp();
             }
-        }
-
-        private static bool[] CheckArgsIsValid(string[] args)
-        {
-            bool[] arg = new bool[2];
-
-            if (args.Length == 0)
-            {
-                return arg;
-            }
-
-            foreach (var item in args)
-            {
-                switch (item)
-                {
-                    case "-o":
-                        arg[0] = true;
-                        break;
-                    case "-a":
-                        arg[1] = true;
-                        break;
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("args not correct!");
-                        Console.ResetColor();
-                        return null;
-                }
-            }
-
-            return arg;
         }
 
         private static string CheckWorkDirectory()
