@@ -1,0 +1,186 @@
+!build.props
+tools/user
+*.$02
+*.err
+*.log
+*.sln.cache
+*.suo
+*.user
+.*.swo
+*.VC.*
+.*.swp
+oacr.build.normalize.stdout
+buildcop_inputs.txt
+tracer_*.txt
+.corext/gen/
+build/configuration/private/xml/importedrulesets/
+build/corext/gen/
+/data
+/Secrets/
+/public/inc/
+.gitClient
+DISTRIB/
+NMakeDependencies/
+[Bb]in
+[Tt]humbs.db
+__tracer
+_NCrunch*
+_ReSharper*
+App_Data
+analysisResults/
+analyzer.xml
+build.*
+build_logs/
+buildd.*
+lock
+oacrBuildOutput/
+OACRTemp/
+obj
+objd
+out/
+packages
+registered_data.ini
+StyleCop.Cache
+*_signjob.json
+target/
+TestResults
+tmp/
+*.dep
+hhcLog.txt
+UpgradeLog.htm
+VCSandbox/
+msbuildd.wrn
+msbuild.binlog
+msbuild.ProjectImports.zip
+InstallUtil.InstallLog
+CorextBootInit.log
+mydirs
+
+# NCrunch. Ignore v2 settings. Allow v3 settings (released 11/29/2016) to share ignored tests
+*.v2.ncrunch*
+
+# Visual Studio temp files
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.filters
+*.db
+*.opendb
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+[Aa]md64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Ignore Security Copy Logs
+*SecurityCopLog*
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# Ignore VS Code settings
+.vscode/
+
+# Exceptions
+!sources/dev/PackageOverrides/src/MsBuild/PackageContainerV14/v14.0/Bin/
+!build/supplements/x86/
+!sources/dev/EntityExtraction/src/TailoredExperiences/Core/Log/
+!sources/Dev/Data/src/storage/Calendar/Log/
+!sources/dev/data/src/storage/OfficeGraph/Common/Log
+!sources/Dev/Transport/src/Monitoring/ProdTesting/Log/
+!sources/test/Hygiene/src/MessageTracing/UnitTests/TestData/*.log
+!sources/test/Transport/src/Monitoring/QTests/ProdTesting/Log/
+!sources/PartnerRelease/Torus/bin/
+!sources/PartnerRelease/Torus/bin/retail/amd64/
+!sources/PartnerRelease/
+!sources/[Dd]ev/[Cc]ommon/src/VariantConfiguration/ExCore/Log/
+!sources/dev/cluster/src/Replay/Log/
+!sources/test/directory/src/Performance/MockResource/*.log
+
+# quickbuild.exe
+/VersionGeneratingLogs/
+VersionGeneration/
+QAnalysisLogs
+QLogs
+QLocal
+QTestLogs
+
+# bad tlb/chm generators in nmake tree
+*.tlb
+*.chm
+
+# Binaries cannot be added
+*.dll
+*.exe
+*.ico
+!sources/dev/Hygiene/src/SOUP/CreateWstManifest/App.ico
+!sources/dev/Hygiene/src/Spiller/Spiller/app.ico
+!sources/PartnerRelease/OfficeBigData/Published/bin/retail/amd64/OfficeDataLoader/*.xml
+*.jpg
+*.jpeg
+*.pdb
+*.png
+sources/dev/bpa/src/exrca/website/images/*.gif
+!sources/dev/E4E/src/Resources/Images/Consumer/*.png
+
+# dump silverlight
+ClientBin/
+
+# Report files from converting an old project file to a newer Visual Studio version
+UpgradeLog*.XML
+UpgradeLog*.htm
+
+# dump azure
+*.build.csdef
+csx/
+*orig
+__cacheOutput/
+deleted/
+build/environment/Environment.cs
+/vim.exe.stackdump
+
+# user specific file used by build clean - this can be copied from user private to build folder so ignore it
+build/userkeep.txt
+/_flights.bld
+/_projects.bld
+/BsdoPackingConfig.xml
+/sources/dev/Query/src/Microsoft.Exchange.Query.DotSettings
+/sources/test/Sos/src/CommonServices/OData/OdataDeserializerSuite - Copy (2).cs
+/sources/tools/OutlookExtensibility/src/Reports/
+.gvfs/
+
+public/ext/PackageTestConfig/
+/sources/test/data/src/StoreObjects.MapiBasedImplementation/Internal.Exchange.Test.Data.StoreObjects.MapiBasedImplementation.sln
+
+#ignore envkeep.txt
+build/envkeep.txt
+
+# Block WinPE bootstrap.txt from checkin
+sources/dev/Setup/src/DataCenter/Certs/bootstrap.txt
+
+# PackageReference generated files
+project.assets.json
+*.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+*.nuget.cache
+*.binlog
+*.wrn
+
+# Ignore ev2 modules
+/sources/dev/Hygiene/src/ThreatIntel/AzureDeployment/EV2Deployment/Ev2Validation/Ev2_Module
+/sources/test/Common/src/TextProcessingUt/Internal.Exchange.TextProcessingUt.sln
+/sources/dev/common/src/TextProcessing/Microsoft.Exchange.TextProcessing.sln
