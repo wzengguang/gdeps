@@ -12,8 +12,6 @@ namespace GDeps
     {
         static async Task Main(string[] args)
         {
-            //StartGetDeps();
-            //StartRestore();
             if (args.Contains("help"))
             {
                 ConsoleHelp();
@@ -31,6 +29,9 @@ namespace GDeps
             var dir = CheckWorkDirectory();
             if (dir != null)
             {
+                //StartGetDeps();
+                //StartRestore();
+
                 var work = new SubstratePackage(dir, checkArgs);
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("starting...");
