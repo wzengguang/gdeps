@@ -1,70 +1,60 @@
-# openfile README
+# Are you tired of cd a directory when work with Substrate project?
+向vscode添加几个右键菜单:
+- cd: 可以更便捷的在terminal cd 到当前目录.   
+- open: 在vscode打开文件.   
+- file explorer: 在文件资源管理器打开文件夹.   
+- open in vs: 在visual studio 打开项目.
+- create terminal: 创建 Enlistment终端. 
 
-This is the README for your extension "openfile". After writing up a brief description, we recommend including the following sections.
+# 如何使用
+- vs code 订阅本扩展
+## 配置 substrate 项目所在目录
+- defaultPath:
+本扩展默认执行的目录,可配置成比如：
+C:\Substrate\src
+- paths:
+ 如果你有多个 substrate 项目目录，可配置成：
+ C:\Substrate\src;C:\Substrate1\src;C:\Substrate2\src
+## .md 文件
+- 该扩展需要在 .md文件使用，在其它类型的文件中无法看到右键菜单。
+## 终端
+如果你不使用 create termianl 命令创建终端，那么右键菜单执行时默认的根目录是配置的 defaultPath. 
+如果你 通过 create termianl 创建终端，右键菜单执行时默认的根目录是创建终端对应的目录。
+注意：不能修改创建的终端的名字，否则会导致程序把当前目录当成默认的目录的错误。
+## 第一次使用
+当第一次使用时，会在你substrate 项目目录的 src 文件夹所在的目录生成 vs-manifest.json 文件。  
+如果想手动添加 .csproj 文件目录，可在此文件夹添加。   
 
-## Features
+## 路径感知
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- 根据光标所在的位置（闪烁），根据上下文件自动感知出要执行的目录或文件，如果你手动选择一段，自动感知不起作用。
+- 比如
+  /sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj Internal.Exchange.Test.Services.OData.MobileDeviceTests.TestCloudMdm
+光标定位在/sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj的任意位置，会自动感知到
+/sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj
+将之视为将要执行命令的路径（根据空格判断）。 你可以选择这个路径具有同样的效果。
 
-For example if there is an image subfolder under your extension project workspace:
+## path： sources/dev/common/src/Net/
+扩展将和你终端所在路径拼接成物理路径，假如终端对应的路径是 C:\Substrate\src. 拼接后的就是 C:\Substrate\src/sources/dev/common/src/Net/.
+可以右键菜单：
+- cd.
+- file explorer.
+## Microsoft.Exchange.Net.AadClient.csproj
+扫描生成的 vs-manifest.json 找到其对应的物理路径。
+可执行的右键菜单：
+- cd.
+- file explorer.
+- open.
+- open in vs: 在visual studio 打开项目.
+## Microsoft.Exchange.Net.AadClient.dll
+扩展会将以.dll结尾的文件理解成.csproj文件。
 
-\!\[feature X\]\(images/feature-x.png\)
+## 可以识别如下各种，慢慢探索吧。
+/sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj 
+Microsoft.Exchange.Net.AadClient.csproj
+Microsoft.Exchange.Net.AadClient.dll  
+sources\dev\common\src\Net\AadClient\AADGroup.cs
+sources/dev/common/src/Net/
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+# git

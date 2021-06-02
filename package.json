@@ -1,8 +1,9 @@
 {
-	"name": "openfile",
-	"displayName": "openfile",
-	"description": "",
-	"version": "0.0.1",
+	"name": "quickcd",
+	"displayName": "quickcd",
+	"description": "Free you of cd a file.",
+	"publisher": "alightwang",
+	"version": "0.0.11",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -10,45 +11,98 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:openfile.open",
-		"onCommand:openfile.terminal",
-		"onCommand:openfile.openDir"
+		"onCommand:quickcd.open",
+		"onCommand:quickcd.default_terminal",
+		"onCommand:quickcd.terminal",
+		"onCommand:quickcd.cd",
+		"onCommand:quickcd.openInVS",
+		"onCommand:quickcd.fileExplorer"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"menus": {
 			"editor/context": [
 				{
-					"command": "openfile.terminal",
-					"group": "openfile",
-					"when": "editorTextFocus"
+					"command": "quickcd.cd",
+					"group": "quickcd@2",
+					"when": "editorTextFocus&&resourceLangId == markdown"
 				},
 				{
-					"command": "openfile.open",
-					"group": "openfile",
-					"when": "editorTextFocus"
+					"command": "quickcd.open",
+					"group": "quickcd@3",
+					"when": "editorTextFocus&&resourceLangId == markdown"
 				},
 				{
-					"command": "openfile.openDir",
-					"group": "openfile",
-					"when": "editorTextFocus"
+					"command": "quickcd.openInVS",
+					"group": "quickcd@4",
+					"when": "editorTextFocus&&resourceLangId == markdown"
+				},
+				{
+					"command": "quickcd.fileExplorer",
+					"group": "quickcd@5",
+					"when": "editorTextFocus&&resourceLangId == markdown"
+				},
+				{
+					"command": "quickcd.default_terminal",
+					"group": "quickcd@6",
+					"when": "editorTextFocus&&resourceLangId == markdown"
+				},
+				{
+					"command": "quickcd.terminal",
+					"group": "quickcd@7",
+					"when": "editorTextFocus&&resourceLangId == markdown"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "openfile.terminal",
-				"title": "create terminal"
+				"command": "quickcd.default_terminal",
+				"title": "quickcd: default terminal"
 			},
 			{
-				"command": "openfile.open",
-				"title": "open"
+				"command": "quickcd.terminal",
+				"title": "quickcd: create terminal"
 			},
 			{
-				"command": "openfile.openDir",
-				"title": "openDir"
+				"command": "quickcd.terminal_3",
+				"title": "quickcd: create terminal3"
+			},
+			{
+				"command": "quickcd.open",
+				"title": "quickcd: open"
+			},
+			{
+				"command": "quickcd.cd",
+				"title": "quickcd: cd"
+			},
+			{
+				"command": "quickcd.openInVS",
+				"title": "quickcd: open in VS"
+			},
+			{
+				"command": "quickcd.fileExplorer",
+				"title": "quickcd: file explorer"
 			}
-		]
+		],
+		"configuration": {
+			"title": "quickcd",
+			"type": "object",
+			"properties": {
+				"quickcd": {
+					"type": "object",
+					"properties": {
+						"defaultPath": {
+							"type": "string",
+							"default": "C:\\Substrate\\src"
+						},
+						"paths": {
+							"type": "string",
+							"default": ""
+						}
+					}
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
