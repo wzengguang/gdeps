@@ -47,7 +47,9 @@ C:\Substrate\src
 - open.
 - open in vs: 在visual studio 打开项目.
 ## Microsoft.Exchange.Net.AadClient.dll
-扩展会将以.dll结尾的文件理解成.csproj文件。
+扩展会将以.dll结尾的文件理解成.csproj文件。   
+
+- 此外，可以识别 vs-manifest.json 没有但本地刚刚 produce 的core项目。
 
 ## 可以识别如下各种，慢慢探索吧。
 /sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj 

@@ -185,12 +185,19 @@ export class OpenFileManager {
             if (isDir) {
                 p += "\\";
             }
-            
+
             if (fs.existsSync(p)) {
                 return p;
             } else {
                 return '';
             }
+        }
+
+        let isCoreProject = false;
+        if (selection.endsWith(".NetCore.csproj")) {
+            isCoreProject = true;
+            selection = selection.replace(".NetCore.csproj", ".csproj");
+            selection = path.basename(selection);
         }
 
         var fp = selection.split(path.sep);
@@ -210,12 +217,22 @@ export class OpenFileManager {
                 i++;
             }
         }
-        if (filter.length == 1) {
-            return filter[0];
-        }
         if (filter.length == 0) {
             vscode.window.showInformationMessage("file not fond!");
         }
+        if (filter.length == 1) {
+            if (isCoreProject) {
+                let mp = filter[0].split(path.sep);
+                mp[mp.length - 1] = mp[mp.length - 1].replace(".csproj", ".NetCore.csproj");
+                mp[mp.length - 2] = mp[mp.length - 2] + ".NetCore";
+                filter[0] = mp.join('/');
+                if (!fs.existsSync(filter[0])) {
+                    return '';
+                }
+            }
+            return filter[0];
+        }
+
         if (filter.length > 1) {
             vscode.window.showInformationMessage("Ambiguous files:" + filter.join('|'));
         }
