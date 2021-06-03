@@ -181,19 +181,26 @@ export class OpenFileManager {
         if (selection.endsWith(".dll")) {
             selection = selection.substring(0, selection.length - 4) + ".csproj";
         }
-
+        
         if (!selection.endsWith(".csproj")) {
             let isDir = selection.endsWith("/") || selection.endsWith("\\");
+
             let p = path.resolve(this.activeDir, selection);
+
+            if (!fs.existsSync(p) && (selection[0] == '/' || selection[0] == '\\')) {
+                selection = selection.substring(1);
+                p = path.resolve(this.activeDir, selection);
+            }
+
+            if (!fs.existsSync(p)) {
+                return '';
+            }
+
             if (isDir) {
                 p += "\\";
             }
 
-            if (fs.existsSync(p)) {
-                return p;
-            } else {
-                return '';
-            }
+            return p;
         }
 
         // consider remove it alter.
@@ -322,7 +329,6 @@ export class OpenFileManager {
 
         let r = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, end));
         text = vscode.window.activeTextEditor?.document.getText(r);
-        console.log(start.toString() + text);
         return text;
     }
 }
