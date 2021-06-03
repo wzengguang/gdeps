@@ -1,7 +1,11 @@
 This extension is only for who work with Substrate project of micorsoft.
 
 # Are you tired of cd a directory when work with Substrate project?
-**有这么一个 Entities.OnlineMeetings.dll，怎么更快速的cd到该dll的目录？打开对应的csproj文件？使用 Enlistment 在visualstudio在打开？浏览所在的文件夹？**   
+**你知道这个名字 Entities.OnlineMeetings.dll:**
+- 怎么更快速的cd到该dll的目录？
+- 打开对应的csproj文件？
+- 使用 Enlistment 在visualstudio在打开？
+- 浏览所在的文件夹?
 
 **本扩展，只需要点两下鼠标就能实现你想要的！！**
 
@@ -13,7 +17,6 @@ This extension is only for who work with Substrate project of micorsoft.
 - file explorer: 在文件资源管理器打开文件夹.也可以打开指定文件路径的所在文件夹。   
 - open in vs: 使用 Enlistment 终端在 visual studio 打开项目.
 - default terminal: 在vscode快捷创建默认目录 Enlistment 终端. 
-## 其它
 - create terminal: 在vscode中按F1呼出，搜quickcd,点击 quickcd: create ternminal,选择对应的目录， 在vscode创建指定的 Enlistment 终端.
 - 注意：右键菜单需要在 .md文件使用，在其它类型的文件中无法看到右键菜单。
 # 如何使用
@@ -60,18 +63,18 @@ src是substrate项目的根目录。
 
 - 此外，可以识别 vs-manifest.json 没有但本地刚刚 produce 的core项目。
 
-## 可以识别如下各种，慢慢探索吧。
+## 可以自动识别如下各种路径，慢慢探索吧。
 /sources/dev/common/src/Net/AadClient/Microsoft.Exchange.Net.AadClient.csproj 
 Microsoft.Exchange.Net.AadClient.csproj
 Microsoft.Exchange.Net.AadClient.dll  
 sources\dev\common\src\Net\AadClient\AADGroup.cs
 sources/dev/common/src/Net/
-
-AAAAAAAAAA Microsoft.Exchange.Net.AadClient.csproj AAAAAAAAA      
+- 还可以自动排除要识别前、后的干扰文本：直接识别到：Microsoft.Exchange.Net.AadClient.csproj
+asdasdas Microsoft.Exchange.Net.AadClient.csproj asdasdwa      
 
 # Links
 * [Marketplace](https://marketplace.visualstudio.com/items?itemName=alightwang.quickcd)
 * [Source Code](https://github.com/wzengguang/quickOpenFile)
 
 # License
-[Apache]()
+[Apache](https://github.com/emeraldwalk/vscode-runonsave/blob/master/LICENSE)

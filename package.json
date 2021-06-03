@@ -3,7 +3,7 @@
 	"displayName": "quickcd",
 	"description": "Free you of cd a file.",
 	"publisher": "alightwang",
-	"version": "0.0.143",
+	"version": "0.0.144",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
