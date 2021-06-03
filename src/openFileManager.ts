@@ -304,7 +304,7 @@ export class OpenFileManager {
         if (!range.isEmpty) {
             return text;
         }
-        
+
         var findRange = range;
         let start = range.start.character;
         let end = range.end.character;
@@ -312,16 +312,17 @@ export class OpenFileManager {
         do {
             findRange = new vscode.Range(new vscode.Position(range.start.line, start--), new vscode.Position(range.end.line, start));
             text = vscode.window.activeTextEditor?.document.getText(findRange);
-        } while (start > 0 && text?.match(/^ *$/) == null)
+        } while (start > 0 && text?.match(/\s/) == null)
 
         const maxCharater = vscode.window.activeTextEditor?.document.lineAt(range.start.line).range.end.character;
         do {
             findRange = new vscode.Range(new vscode.Position(range.start.line, end), new vscode.Position(range.end.line, ++end));
             text = vscode.window.activeTextEditor?.document.getText(findRange);
-        } while (end < <number>maxCharater && text?.match(/^ *$/) == null)
+        } while (end < <number>maxCharater && text?.match(/\s/) == null)
 
         let r = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, end));
         text = vscode.window.activeTextEditor?.document.getText(r);
+        console.log(start.toString() + text);
         return text;
     }
 }

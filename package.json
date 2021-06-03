@@ -3,13 +3,17 @@
 	"displayName": "quickcd",
 	"description": "Free you of cd a file.",
 	"publisher": "alightwang",
-	"version": "0.0.14",
+	"version": "0.0.143",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
 	"categories": [
 		"Other"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wzengguang/quickOpenFile"
+	},
 	"activationEvents": [
 		"onCommand:quickcd.open",
 		"onCommand:quickcd.default_terminal",
@@ -46,11 +50,6 @@
 					"command": "quickcd.default_terminal",
 					"group": "quickcd@6",
 					"when": "editorTextFocus&&resourceLangId == markdown"
-				},
-				{
-					"command": "quickcd.terminal",
-					"group": "quickcd@7",
-					"when": "editorTextFocus&&resourceLangId == markdown"
 				}
 			]
 		},
@@ -62,10 +61,6 @@
 			{
 				"command": "quickcd.terminal",
 				"title": "quickcd: create terminal"
-			},
-			{
-				"command": "quickcd.terminal_3",
-				"title": "quickcd: create terminal3"
 			},
 			{
 				"command": "quickcd.open",

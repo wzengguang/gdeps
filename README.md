@@ -1,26 +1,35 @@
+This extension is only for who work with Substrate project of micorsoft.
+
 # Are you tired of cd a directory when work with Substrate project?
-向vscode添加几个右键菜单，实现快捷功能:
+**有这么一个 Entities.OnlineMeetings.dll，怎么更快速的cd到该dll的目录？打开对应的csproj文件？使用 Enlistment 在visualstudio在打开？浏览所在的文件夹？**   
+
+**本扩展，只需要点两下鼠标就能实现你想要的！！**
+
+![](./guidance.gif)
+
+## 向vscode添加几个右键菜单，实现快捷功能:
 - cd: 可以更便捷的在terminal 中 cd 到当前目录.   
 - open: 快捷的在vscode打开文件.   
 - file explorer: 在文件资源管理器打开文件夹.也可以打开指定文件路径的所在文件夹。   
 - open in vs: 使用 Enlistment 终端在 visual studio 打开项目.
 - default terminal: 在vscode快捷创建默认目录 Enlistment 终端. 
-- create terminal: 在vscode创建指定的 Enlistment 终端.
-
+## 其它
+- create terminal: 在vscode中按F1呼出，搜quickcd,点击 quickcd: create ternminal,选择对应的目录， 在vscode创建指定的 Enlistment 终端.
+- 注意：右键菜单需要在 .md文件使用，在其它类型的文件中无法看到右键菜单。
 # 如何使用
 - vs code 订阅本扩展, 搜 quickcd.
 ## 配置 substrate 项目所在目录
 - defaultPath:
-本扩展默认执行的目录,可配置成比如：  
+本扩展默认需要的目录,可配置成，比如：  
 C:\Substrate\src   
+src是substrate项目的根目录。
 - paths:  
  如果你有多个 substrate 项目目录，可配置成：   
  C:\Substrate\src;C:\Substrate1\src;C:\Substrate2\src   
  以 ; 分隔.
-- 注意：该扩展需要在 .md文件使用，在其它类型的文件中无法看到右键菜单。
 ## 终端
-如果你不使用 create termianl 命令创建终端，那么右键菜单执行时默认的根目录是配置的 defaultPath. 
-如果你 通过 create termianl 创建终端，右键菜单执行时默认的根目录是创建终端对应的目录。
+如果你不使用 create termianl 命令创建终端并使该终端处于活动状态，那么右键菜单执行时默认的根目录是配置的 defaultPath. 
+如果你通过 create termianl 创建终端，右键菜单执行时默认的根目录是创建终端对应的目录。
 注意：不能修改创建的终端的名字，否则会导致程序把当前目录当成默认的目录的错误。
 ## 第一次使用
 当第一次使用时，会在你substrate 项目目录的 src 文件夹所在的目录生成 vs-manifest.json 文件。  
@@ -60,5 +69,9 @@ sources/dev/common/src/Net/
 
 AAAAAAAAAA Microsoft.Exchange.Net.AadClient.csproj AAAAAAAAA      
 
-# git
-https://github.com/wzengguang/quickOpenFile
+# Links
+* [Marketplace](https://marketplace.visualstudio.com/items?itemName=alightwang.quickcd)
+* [Source Code](https://github.com/wzengguang/quickOpenFile)
+
+# License
+[Apache]()
