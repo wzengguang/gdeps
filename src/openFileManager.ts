@@ -2,9 +2,11 @@ import * as vscode from "vscode";
 import * as fs from 'fs';
 import * as path from 'path';
 import { Uri } from "vscode";
+
 export class OpenFileManager {
 
     private _config: { [key: string]: string } = {};
+
     private _projects: { [key: string]: string[] } = {};
 
     private get activeDirName(): string {
@@ -111,16 +113,17 @@ export class OpenFileManager {
     public createTerminal(name: string = '') {
         if (name != "defaultPath") {
             let canCreate = [];
-            let i = 0;
             for (let key in this._config) {
                 if (key != "paths" && key != "defaultPath" && fs.existsSync(this._config[key])) {
                     canCreate.push(key);
                 }
             }
+
             if (canCreate.length == 0) {
                 vscode.window.showInformationMessage("You has not set config paths value!");
                 return;
             }
+
             vscode.window.showQuickPick(canCreate).then(res => {
                 if (res) {
                     this.creatNamedTerminal(res);
@@ -142,6 +145,7 @@ export class OpenFileManager {
             vscode.window.showInformationMessage("Can't create terminal. path:" + dir + " is not exist.");
             return;
         }
+
         var terminal = vscode.window.createTerminal(name);
         var cmd = "SET INETROOT=" + dir + "&cd /d " + dir + "&gvfs mount&" + dir + "\\tools\\path1st\\myenv.cmd";
         terminal.show();
@@ -151,6 +155,7 @@ export class OpenFileManager {
     public changeTerminal(t: vscode.Terminal | undefined) {
 
     }
+
     public onCloseTerminal(t: vscode.Terminal | undefined) {
         if (t) {
             const name = t.name;
@@ -178,9 +183,7 @@ export class OpenFileManager {
         }
 
         if (!selection.endsWith(".csproj")) {
-
             let isDir = selection.endsWith("/") || selection.endsWith("\\");
-
             let p = path.resolve(this.activeDir, selection);
             if (isDir) {
                 p += "\\";
@@ -193,6 +196,7 @@ export class OpenFileManager {
             }
         }
 
+        // consider remove it alter.
         let isCoreProject = false;
         if (selection.endsWith(".NetCore.csproj")) {
             isCoreProject = true;
@@ -217,9 +221,11 @@ export class OpenFileManager {
                 i++;
             }
         }
+
         if (filter.length == 0) {
             vscode.window.showInformationMessage("file not fond!");
         }
+
         if (filter.length == 1) {
             if (isCoreProject) {
                 let mp = filter[0].split(path.sep);
@@ -236,6 +242,7 @@ export class OpenFileManager {
         if (filter.length > 1) {
             vscode.window.showInformationMessage("Ambiguous files:" + filter.join('|'));
         }
+
         return "";
     }
 
@@ -248,8 +255,8 @@ export class OpenFileManager {
             (function next() {
                 var file = list[i++];
                 if (!file) return done(null, results);
-                file = path.resolve(dir, file);
 
+                file = path.resolve(dir, file);
                 fs.stat(file, function (err, stat) {
                     if (stat && stat.isDirectory()) {
                         that.findAllCsproj(file, function (err: any, res: any) {
@@ -297,23 +304,23 @@ export class OpenFileManager {
         if (!range.isEmpty) {
             return text;
         }
-        var find = range;
+        
+        var findRange = range;
         let start = range.start.character;
         let end = range.end.character;
-        let from = start;
 
-        while (--start >= 0 && text != ' ') {
-            find = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, start + 1));
-            text = vscode.window.activeTextEditor?.document.getText(range);
-            from = start;
-        }
+        do {
+            findRange = new vscode.Range(new vscode.Position(range.start.line, start--), new vscode.Position(range.end.line, start));
+            text = vscode.window.activeTextEditor?.document.getText(findRange);
+        } while (start > 0 && text?.match(/^ *$/) == null)
 
-        while (text != ' ' && end < 1000) {
-            find = new vscode.Range(new vscode.Position(range.start.line, end), new vscode.Position(range.end.line, ++end));
-            text = vscode.window.activeTextEditor?.document.getText(range);
-        }
+        const maxCharater = vscode.window.activeTextEditor?.document.lineAt(range.start.line).range.end.character;
+        do {
+            findRange = new vscode.Range(new vscode.Position(range.start.line, end), new vscode.Position(range.end.line, ++end));
+            text = vscode.window.activeTextEditor?.document.getText(findRange);
+        } while (end < <number>maxCharater && text?.match(/^ *$/) == null)
 
-        let r = new vscode.Range(new vscode.Position(range.start.line, from), new vscode.Position(range.end.line, end));
+        let r = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, end));
         text = vscode.window.activeTextEditor?.document.getText(r);
         return text;
     }

@@ -58,6 +58,7 @@ Microsoft.Exchange.Net.AadClient.dll
 sources\dev\common\src\Net\AadClient\AADGroup.cs
 sources/dev/common/src/Net/
 
+AAAAAAAAAA Microsoft.Exchange.Net.AadClient.csproj AAAAAAAAA      
 
 # git
 https://github.com/wzengguang/quickOpenFile
