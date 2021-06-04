@@ -11,6 +11,10 @@ export class OpenFileManager {
 
     private pathSep = /\\|\//;
 
+    private isScaning = false;
+
+    private backgroundScaning = false;
+
     private get activeDirName(): string {
         var name = vscode.window.activeTerminal?.name;
         if (name && this._config[name] && fs.existsSync(this._config[name])) {
@@ -34,6 +38,12 @@ export class OpenFileManager {
     }
 
     private get activeProject(): string[] {
+        if (this.isScaning && !this.backgroundScaning) {
+            vscode.window.showInformationMessage("Please wait. Scaning...");
+            return [];
+        }
+        this.triggerAutoScan();
+
         const dirName = this.activeDirName;
         const dir = this.activeDir;
         if (dirName && dir) {
@@ -42,14 +52,14 @@ export class OpenFileManager {
                 let parent = dir.replace(path.basename(dir), "");
                 let file = path.resolve(parent, "vs-manifest.json");
                 if (!fs.existsSync(file)) {
-                    this.ScanCsproj(dir, dirName);
+                    this.ScanCsproj(dir, dirName, true, () => { });
+                    return [];
                 }
                 var read = fs.readFileSync(file, { encoding: "utf-8" });
                 this._projects[dirName] = JSON.parse(read);
             }
             return this._projects[dirName];
         }
-
         return [];
     }
 
@@ -166,6 +176,39 @@ export class OpenFileManager {
                 p = [];
             }
         }
+    }
+
+    private triggerAutoScan() {
+        let that = this;
+        if (that.backgroundScaning) {
+            return;
+        }
+        const dirName = that.activeDirName;
+        const dir = that.activeDir;
+        setTimeout(() => {
+            if (that.activeProject.length == 0) {
+                return;
+            }
+
+            let past = new Date(that.activeProject[0]);
+
+            if (!(past instanceof Date) || isNaN(past.getTime())) {
+                return;
+            }
+
+            var dif = (new Date().getTime() - past.getTime()) / (3600 * 1000);
+            if (dirName && dir && !that.backgroundScaning && !that.isScaning && dif > 23) {
+                console.log("backgroundScan" + that.backgroundScaning);
+                that.backgroundScaning = true;
+                that.ScanCsproj(dir, dirName, false, () => {
+                    let parent = dir.replace(path.basename(dir), "");
+                    let file = path.resolve(parent, "vs-manifest.json");
+                    var read = fs.readFileSync(file, { encoding: "utf-8" });
+                    that._projects[dirName] = JSON.parse(read);
+                    that.backgroundScaning = false;
+                });
+            }
+        }, 1000)
     }
 
     private getSelectedFilePhysicPath(): string {
@@ -303,7 +346,7 @@ export class OpenFileManager {
         return filter;
     }
 
-    private findAllCsproj(dir: string, done: any) {
+    private findAllCsprojAsync(dir: string, done: any) {
         let that = this;
         let results: any[] = [];
         fs.readdir(dir, function (err, list) {
@@ -314,9 +357,10 @@ export class OpenFileManager {
                 if (!file) return done(null, results);
 
                 file = path.resolve(dir, file);
+
                 fs.stat(file, function (err, stat) {
                     if (stat && stat.isDirectory()) {
-                        that.findAllCsproj(file, function (err: any, res: any) {
+                        that.findAllCsprojAsync(file, function (err: any, res: any) {
                             results = results.concat(res);
                             next();
                         });
@@ -332,18 +376,31 @@ export class OpenFileManager {
         });
     };
 
-    private ScanCsproj(dir: string, key: string) {
+    private ScanCsproj(dir: string, key: string, tip = true, done: Function) {
+
         if (!dir || !key) {
             return;
         }
-        vscode.window.showInformationMessage("You don't have been scan fold, start scaning...");
+        if (tip && !this.isScaning) {
+            vscode.window.showInformationMessage("You don't have been scan fold, start scaning...");
+        }
         let parent = dir.replace(path.basename(dir), "");
         let file = path.resolve(parent, "vs-manifest.json");
-        this.findAllCsproj(dir, (error: any, res: any[]) => {
+
+        this.isScaning = true;
+        this.findAllCsprojAsync(dir, (error: any, res: any[]) => {
+            res.unshift(new Date().toString());
             var json = JSON.stringify(res);
             fs.writeFileSync(file, json);
             this._projects[key] = res;
-            vscode.window.showInformationMessage("Scan finished.");
+            if (done) {
+                done();
+            }
+            if (tip) {
+                vscode.window.showInformationMessage("Scan finished.");
+            }
+            this.isScaning = false;
+            console.log(this.isScaning);
         });
     }
 
