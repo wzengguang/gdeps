@@ -9,6 +9,8 @@ export class OpenFileManager {
 
     private _projects: { [key: string]: string[] } = {};
 
+    private pathSep = /\\|\//;
+
     private get activeDirName(): string {
         var name = vscode.window.activeTerminal?.name;
         if (name && this._config[name] && fs.existsSync(this._config[name])) {
@@ -72,7 +74,7 @@ export class OpenFileManager {
         this._config = <any>vscode.workspace.getConfiguration("quickcd");
         this._config.paths?.trim()?.split(";").forEach((value, index) => {
             if (value) {
-                var key = value.trim().split(path.sep).join('_').replace(':', '');
+                var key = value.trim().split(this.pathSep).join('_').replace(':', '');
 
                 this._config = Object.assign({ [key]: value }, this._config);
             }
@@ -96,7 +98,7 @@ export class OpenFileManager {
         if (physicDir && physicDir.endsWith("proj")) {
             let parent = path.dirname(physicDir);
             vscode.window.activeTerminal?.sendText("cd " + parent);
-            vscode.window.activeTerminal?.sendText(physicDir.split(path.sep).pop() as string);
+            vscode.window.activeTerminal?.sendText(physicDir.split(this.pathSep).pop() as string);
         }
     }
 
@@ -181,7 +183,7 @@ export class OpenFileManager {
         if (selection.endsWith(".dll")) {
             selection = selection.substring(0, selection.length - 4) + ".csproj";
         }
-        
+
         if (!selection.endsWith(".csproj")) {
             let isDir = selection.endsWith("/") || selection.endsWith("\\");
 
@@ -193,6 +195,7 @@ export class OpenFileManager {
             }
 
             if (!fs.existsSync(p)) {
+                vscode.window.showInformationMessage("File or directory not fond!");
                 return '';
             }
 
@@ -203,23 +206,92 @@ export class OpenFileManager {
             return p;
         }
 
-        // consider remove it alter.
+        var filter = this.getMatchedCsproj(selection);
         let isCoreProject = false;
-        if (selection.endsWith(".NetCore.csproj")) {
-            isCoreProject = true;
-            selection = selection.replace(".NetCore.csproj", ".csproj");
-            selection = path.basename(selection);
+        if (filter.length == 0) {
+            // find netcore project in local file but not in file vs-manifest.json.
+            if (selection.endsWith(".NetCore.csproj")) {
+                isCoreProject = true;
+                let frameworkName = selection.replace(".NetCore.csproj", ".csproj");
+                frameworkName = path.basename(frameworkName);
+                filter = this.getMatchedCsproj(frameworkName);
+            }
+
+            if (filter.length == 0) {
+                var tryFind = this.tryFindSimilarName(selection);
+                if (tryFind.length > 0) {
+                    vscode.window.showInformationMessage("file not fond;But has similar file: " + tryFind.join('\n'));
+                } else {
+                    vscode.window.showInformationMessage("file not fond!");
+                }
+                return '';
+            }
         }
 
-        var fp = selection.split(path.sep);
-        var fName = fp[fp.length - 1];
+        if (filter.length == 1) {
+            if (isCoreProject) {
+                let mp = filter[0].split(this.pathSep);
+                mp[mp.length - 1] = mp[mp.length - 1].replace(".csproj", ".NetCore.csproj");
+                mp[mp.length - 2] = mp[mp.length - 2] + ".NetCore";
+                filter[0] = mp.join('/');
+                if (!fs.existsSync(filter[0])) {
+                    vscode.window.showInformationMessage("Have not been produced file.");
+                    return '';
+                }
+            }
+            return filter[0];
+        }
 
+        if (filter.length > 1) {
+            vscode.window.showInformationMessage("Ambiguous files:" + filter.join('\n'));
+        }
+
+        return "";
+    }
+
+    private tryFindSimilarName(selection: string): string[] {
+        var fp = selection.split(this.pathSep);
+        let name = fp[fp.length - 1];
+        fp = name.split('.');
+        fp = fp.slice(0, fp.length - 1);
+        let fileName = fp.join('.');
+        let filter: string[] = this.activeProject;
+
+        let priamry = filter.filter(a => {
+            let arr = a.split(this.pathSep);
+            let arrp = arr[arr.length - 1].replace('.csproj', '');
+            return a.includes(fileName) || fileName.includes(arrp);
+        })
+        if (priamry.length < 4 && priamry.length > 0) {
+            return priamry;
+        }
+        if (priamry.length > 0) {
+            filter = priamry;
+        }
+
+        for (let i = 0; i < fp.length; i++) {
+            const e = fp[i];
+            let f = filter.filter(a => a.includes(e));
+            if (f.length == 1) {
+                return f;
+            }
+            if (f.length == 0) {
+                return filter;
+            }
+            filter = f;
+        }
+        return filter.slice(0, 9);
+    }
+
+    private getMatchedCsproj(selection: string): string[] {
+        var fp = selection.split(this.pathSep);
+        var fName = fp[fp.length - 1];
         var filter = this.activeProject.filter(a => a.endsWith(fName));
         if (filter.length > 1) {
             let i = 2;
             while (filter.length > 1 && fp.length - i >= 0) {
                 filter = filter.filter(a => {
-                    let sp = a.split(path.sep);
+                    let sp = a.split(this.pathSep);
                     if (sp.length - i < 0) {
                         return false;
                     }
@@ -228,29 +300,7 @@ export class OpenFileManager {
                 i++;
             }
         }
-
-        if (filter.length == 0) {
-            vscode.window.showInformationMessage("file not fond!");
-        }
-
-        if (filter.length == 1) {
-            if (isCoreProject) {
-                let mp = filter[0].split(path.sep);
-                mp[mp.length - 1] = mp[mp.length - 1].replace(".csproj", ".NetCore.csproj");
-                mp[mp.length - 2] = mp[mp.length - 2] + ".NetCore";
-                filter[0] = mp.join('/');
-                if (!fs.existsSync(filter[0])) {
-                    return '';
-                }
-            }
-            return filter[0];
-        }
-
-        if (filter.length > 1) {
-            vscode.window.showInformationMessage("Ambiguous files:" + filter.join('|'));
-        }
-
-        return "";
+        return filter;
     }
 
     private findAllCsproj(dir: string, done: any) {

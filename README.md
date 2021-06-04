@@ -72,6 +72,10 @@ sources/dev/common/src/Net/
 - 还可以自动排除要识别前、后的干扰文本：直接识别到：Microsoft.Exchange.Net.AadClient.csproj
 asdasdas Microsoft.Exchange.Net.AadClient.csproj asdasdwa      
 
+## 其它智能提示
+Microsoft.Exchange.Entities.OnlineMeetings.dll 
+比如这个dll，找不到对应的项目文件名是，会提示你哪些文件名和它比较像。
+
 # Links
 * [Marketplace](https://marketplace.visualstudio.com/items?itemName=alightwang.quickcd)
 * [Source Code](https://github.com/wzengguang/quickOpenFile)
