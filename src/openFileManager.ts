@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import * as fs from 'fs';
 import * as path from 'path';
 import { Uri } from "vscode";
+import * as request from "request-promise-native";
+import * as manifest from './vs-manifest.json';
 
 export class OpenFileManager {
 
@@ -42,21 +44,29 @@ export class OpenFileManager {
             vscode.window.showInformationMessage("Please wait. Scaning...");
             return [];
         }
-        this.triggerAutoScan();
 
         const dirName = this.activeDirName;
         const dir = this.activeDir;
         if (dirName && dir) {
             let p = this._projects[dirName];
             if (!p || !p.length || p.length == 0) {
+                this._projects[dirName] = [];
                 let parent = dir.replace(path.basename(dir), "");
                 let file = path.resolve(parent, "vs-manifest.json");
                 if (!fs.existsSync(file)) {
-                    this.ScanCsproj(dir, dirName, true, () => { });
-                    return [];
+                    if (this._config["autoScan"]) {
+                        this.ScanCsproj(dir, dirName, true, () => { });
+                        return [];
+                    } else {
+                        for (let index = 0; index < manifest.length; index++) {
+                            const e = path.resolve(dir, manifest[index]);
+                            this._projects[dirName].push(e);
+                        }
+                    }
+                } else {
+                    var read = fs.readFileSync(file, { encoding: "utf-8" });
+                    this._projects[dirName] = JSON.parse(read);
                 }
-                var read = fs.readFileSync(file, { encoding: "utf-8" });
-                this._projects[dirName] = JSON.parse(read);
             }
             return this._projects[dirName];
         }
@@ -65,10 +75,11 @@ export class OpenFileManager {
 
     public constructor() {
         this.loadConfig();
+        this.triggerAutoScan();
     }
 
-    public cdDirectory() {
-        let physicDir = this.getSelectedFilePhysicPath();
+    public async cdDirectory() {
+        let physicDir = await this.getSelectedFilePhysicPath();
         if (physicDir) {
             let dir = physicDir;
             fs.stat(physicDir, (e, s) => {
@@ -92,7 +103,7 @@ export class OpenFileManager {
     }
 
     public async open() {
-        let selection: string = this.getSelectedFilePhysicPath();
+        let selection: string = await this.getSelectedFilePhysicPath();
         if (selection) {
             fs.stat(selection, async (error, stats) => {
                 if (!stats.isDirectory()) {
@@ -103,8 +114,8 @@ export class OpenFileManager {
         }
     }
 
-    public openInVS() {
-        let physicDir = this.getSelectedFilePhysicPath();
+    public async openInVS() {
+        let physicDir = await this.getSelectedFilePhysicPath();
         if (physicDir && physicDir.endsWith("proj")) {
             let parent = path.dirname(physicDir);
             vscode.window.activeTerminal?.sendText("cd " + parent);
@@ -112,8 +123,8 @@ export class OpenFileManager {
         }
     }
 
-    public revealInFileExplorer() {
-        let selection: string = this.getSelectedFilePhysicPath();
+    public async revealInFileExplorer() {
+        let selection: string = await this.getSelectedFilePhysicPath();
         if (selection) {
             fs.stat(selection, (e, s) => {
                 let dir = s.isDirectory() ? selection : path.dirname(selection);
@@ -180,9 +191,11 @@ export class OpenFileManager {
 
     private triggerAutoScan() {
         let that = this;
-        if (that.backgroundScaning) {
+
+        if (that.backgroundScaning || !this._config["autoScan"]) {
             return;
         }
+
         const dirName = that.activeDirName;
         const dir = that.activeDir;
         setTimeout(() => {
@@ -198,7 +211,6 @@ export class OpenFileManager {
 
             var dif = (new Date().getTime() - past.getTime()) / (3600 * 1000);
             if (dirName && dir && !that.backgroundScaning && !that.isScaning && dif > 23) {
-                console.log("backgroundScan" + that.backgroundScaning);
                 that.backgroundScaning = true;
                 that.ScanCsproj(dir, dirName, false, () => {
                     let parent = dir.replace(path.basename(dir), "");
@@ -211,7 +223,7 @@ export class OpenFileManager {
         }, 1000)
     }
 
-    private getSelectedFilePhysicPath(): string {
+    private async getSelectedFilePhysicPath(): Promise<string> {
         let selection = this.getSlection();
 
         if (!selection) {
@@ -251,6 +263,7 @@ export class OpenFileManager {
 
         var filter = this.getMatchedCsproj(selection);
         let isCoreProject = false;
+        let tryFind: string[] = [];
         if (filter.length == 0) {
             // find netcore project in local file but not in file vs-manifest.json.
             if (selection.endsWith(".NetCore.csproj")) {
@@ -261,13 +274,7 @@ export class OpenFileManager {
             }
 
             if (filter.length == 0) {
-                var tryFind = this.tryFindSimilarName(selection);
-                if (tryFind.length > 0) {
-                    vscode.window.showInformationMessage("file not fond;But has similar file: " + tryFind.join('\n'));
-                } else {
-                    vscode.window.showInformationMessage("file not fond!");
-                }
-                return '';
+                tryFind = this.tryFindSimilarName(selection);
             }
         }
 
@@ -282,7 +289,25 @@ export class OpenFileManager {
                     return '';
                 }
             }
+            
             return filter[0];
+        }
+
+        if (selection.endsWith(".csproj")) {
+            const name = path.basename(selection);
+            const dll = name.substring(0, name.length - 7) + ".dll";
+            let fromRemote = await this.getfileLocationFromRemoteDGT(dll);
+            if (fromRemote) {
+                this.activeProject.push(fromRemote);
+                this.writeToLocationFile();
+                return fromRemote;
+            }
+        }
+
+        if (tryFind.length > 0) {
+            vscode.window.showInformationMessage("file not fond;But has similar file: " + tryFind.join('\n'));
+        } else {
+            vscode.window.showInformationMessage("file not fond!");
         }
 
         if (filter.length > 1) {
@@ -290,6 +315,18 @@ export class OpenFileManager {
         }
 
         return "";
+    }
+
+    private writeToLocationFile() {
+        let dir = this.activeDir;
+        if (!this.activeDir) {
+            return;
+        }
+
+        let parent = dir.replace(path.basename(dir), "");
+        let file = path.resolve(parent, "vs-manifest.json");
+        var json = JSON.stringify(this.activeProject);
+        fs.writeFileSync(file, json);
     }
 
     private tryFindSimilarName(selection: string): string[] {
@@ -305,9 +342,11 @@ export class OpenFileManager {
             let arrp = arr[arr.length - 1].replace('.csproj', '');
             return a.includes(fileName) || fileName.includes(arrp);
         })
+
         if (priamry.length < 4 && priamry.length > 0) {
             return priamry;
         }
+
         if (priamry.length > 0) {
             filter = priamry;
         }
@@ -318,9 +357,11 @@ export class OpenFileManager {
             if (f.length == 1) {
                 return f;
             }
+
             if (f.length == 0) {
                 return filter;
             }
+
             filter = f;
         }
         return filter.slice(0, 9);
@@ -338,11 +379,13 @@ export class OpenFileManager {
                     if (sp.length - i < 0) {
                         return false;
                     }
+
                     return sp[sp.length - i] == fp[fp.length - i];
                 });
                 i++;
             }
         }
+
         return filter;
     }
 
@@ -351,6 +394,7 @@ export class OpenFileManager {
         let results: any[] = [];
         fs.readdir(dir, function (err, list) {
             if (err) return done(err);
+
             var i = 0;
             (function next() {
                 var file = list[i++];
@@ -369,6 +413,7 @@ export class OpenFileManager {
                             console.log(file);
                             results.push(file);
                         }
+
                         next();
                     }
                 });
@@ -377,13 +422,14 @@ export class OpenFileManager {
     };
 
     private ScanCsproj(dir: string, key: string, tip = true, done: Function) {
-
         if (!dir || !key) {
             return;
         }
+
         if (tip && !this.isScaning) {
             vscode.window.showInformationMessage("You don't have been scan fold, start scaning...");
         }
+
         let parent = dir.replace(path.basename(dir), "");
         let file = path.resolve(parent, "vs-manifest.json");
 
@@ -396,11 +442,12 @@ export class OpenFileManager {
             if (done) {
                 done();
             }
+
             if (tip) {
                 vscode.window.showInformationMessage("Scan finished.");
             }
+
             this.isScaning = false;
-            console.log(this.isScaning);
         });
     }
 
@@ -410,6 +457,7 @@ export class OpenFileManager {
         if (activeTextEditor) {
             selection = this.indentifyFile(activeTextEditor.selection);
         }
+
         return selection?.trim();
     }
 
@@ -437,5 +485,83 @@ export class OpenFileManager {
         let r = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, end));
         text = vscode.window.activeTextEditor?.document.getText(r);
         return text;
+    }
+
+
+    private async getLatestVersion() {
+        let address = this._config["DGTAddress"] || "http://10.158.22.18";
+        if (!address) {
+            return '';
+        }
+
+        const url = address + "/api/graph/latest-version";
+        var options = {
+            uri: url,
+        };
+        let result;
+        try {
+            result = await request.get(options);
+        } catch (error) {
+            vscode.window.showInformationMessage("Request to " + url + " failed.")
+        }
+
+        result = JSON.parse(result);
+        if (result && result["status"] == 200 && result["data"]) {
+            return result["data"];
+        }
+
+        return '';
+    }
+
+    private async getfileLocationFromRemoteDGT(name: string) {
+        let version = await this.getLatestVersion();
+        if (!version) {
+            return '';
+        }
+
+        let address = this._config["DGTAddress"] || "http://10.158.22.18";
+
+        const url = address + "/api/graph/assembly/details?";
+
+        let result = await request.get({
+            uri: url + this.objectToQueryString({
+                assembly: name,
+                version: version,
+                process: ''
+            })
+        });
+
+        result = JSON.parse(result);
+        if (result && result["status"] == 200) {
+            if (!(result["data"] && result["data"]["sourcePath"])) {
+                vscode.window.showInformationMessage(name + " can't fond in DGT.")
+                return '';
+            }
+
+            let res = result["data"]["sourcePath"] as string;
+            res = res.replace(version, 'version');
+            res = res.replace(/\\/g, '/');
+
+            res = res.replace("//redmond/exchange/build/substrate/version/Sources/", '');
+            let p = path.resolve(this.activeDir, res);
+            if (fs.existsSync(p)) {
+                return p;
+            } else {
+                vscode.window.showInformationMessage(name + ": exists in DGT but doesn't exist in your mechine.")
+            }
+        }
+
+        return '';
+    }
+
+    private objectToQueryString(obj: any) {
+        var str = [];
+        for (var p in obj) {
+            if (obj.hasOwnProperty(p)) {
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            }
+        }
+
+        return str.join("&");
     }
 }

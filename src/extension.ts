@@ -15,16 +15,16 @@ export function activate(context: vscode.ExtensionContext) {
 		manager.createTerminal();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('quickcd.fileExplorer', () => {
-		manager.revealInFileExplorer();
+	context.subscriptions.push(vscode.commands.registerCommand('quickcd.fileExplorer', async () => {
+		await manager.revealInFileExplorer();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('quickcd.cd', () => {
-		manager.cdDirectory();
+	context.subscriptions.push(vscode.commands.registerCommand('quickcd.cd', async () => {
+		await manager.cdDirectory();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('quickcd.openInVS', () => {
-		manager.openInVS();
+	context.subscriptions.push(vscode.commands.registerCommand('quickcd.openInVS', async () => {
+		await manager.openInVS();
 	}));
 
 	vscode.workspace.onDidChangeConfiguration(() => {
