@@ -158,10 +158,17 @@ export class OpenFileManager {
     }
 
     private creatNamedTerminal(name: string) {
+
+        const existT = vscode.window.activeTerminal?.name;
+        if (existT && existT != 'defaultPath') {
+            vscode.window.activeTerminal?.dispose();
+        }
+
         if (!name) {
             vscode.window.showInformationMessage("Can't create terminal. Do you forget config root path.");
             return;
         }
+
 
         const dir = this._config[name];
         if (!fs.existsSync(dir)) {
@@ -250,7 +257,7 @@ export class OpenFileManager {
             }
 
             if (!fs.existsSync(p)) {
-                vscode.window.showInformationMessage("File or directory not fond!");
+                vscode.window.showInformationMessage(p + ' not fond!');
                 return '';
             }
 
@@ -289,7 +296,7 @@ export class OpenFileManager {
                     return '';
                 }
             }
-            
+
             return filter[0];
         }
 
@@ -471,19 +478,31 @@ export class OpenFileManager {
         let start = range.start.character;
         let end = range.end.character;
 
+        const regx = /\w|\.|\_|\\|\/|\:/;
+
         do {
             findRange = new vscode.Range(new vscode.Position(range.start.line, start--), new vscode.Position(range.end.line, start));
             text = vscode.window.activeTextEditor?.document.getText(findRange);
-        } while (start > 0 && text?.match(/\s/) == null)
+        } while (start > 0 && text?.match(regx) != null)
 
         const maxCharater = vscode.window.activeTextEditor?.document.lineAt(range.start.line).range.end.character;
         do {
             findRange = new vscode.Range(new vscode.Position(range.start.line, end), new vscode.Position(range.end.line, ++end));
             text = vscode.window.activeTextEditor?.document.getText(findRange);
-        } while (end < <number>maxCharater && text?.match(/\s/) == null)
+        } while (end < <number>maxCharater && text?.match(regx) != null)
 
         let r = new vscode.Range(new vscode.Position(range.start.line, start), new vscode.Position(range.end.line, end));
         text = vscode.window.activeTextEditor?.document.getText(r);
+
+        if (text?.substr(0, 1).match(regx) == null) {
+            text = text?.substr(1);
+        }
+        console.log(text?.charAt(text.length).match(regx) == null)
+        console.log(text?.substr(-1))
+        if (text?.substr(-1) != '' && text?.substr(-1).match(regx) == null) {
+            text = text?.substr(0, text.length - 1);
+            console.log(text)
+        }
         return text;
     }
 

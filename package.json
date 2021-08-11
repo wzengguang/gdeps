@@ -3,7 +3,7 @@
 	"displayName": "quickcd",
 	"description": "Free you of cd a file.",
 	"publisher": "alightwang",
-	"version": "0.0.191",
+	"version": "0.0.202",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -29,27 +29,26 @@
 				{
 					"command": "quickcd.cd",
 					"group": "quickcd@2",
-					"when": "editorTextFocus&&resourceLangId == markdown"
+					"when": "editorTextFocus"
 				},
 				{
 					"command": "quickcd.open",
 					"group": "quickcd@3",
-					"when": "editorTextFocus&&resourceLangId == markdown"
+					"when": "editorTextFocus"
 				},
 				{
 					"command": "quickcd.openInVS",
 					"group": "quickcd@4",
-					"when": "editorTextFocus&&resourceLangId == markdown"
+					"when": "editorTextFocus"
 				},
 				{
 					"command": "quickcd.fileExplorer",
 					"group": "quickcd@5",
-					"when": "editorTextFocus&&resourceLangId == markdown"
+					"when": "editorTextFocus"
 				},
 				{
 					"command": "quickcd.default_terminal",
-					"group": "quickcd@6",
-					"when": "editorTextFocus&&resourceLangId == markdown"
+					"group": "quickcd@6"
 				}
 			]
 		},
