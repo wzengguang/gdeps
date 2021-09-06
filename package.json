@@ -3,7 +3,7 @@
 	"displayName": "quickcd",
 	"description": "Free you of cd a file.",
 	"publisher": "alightwang",
-	"version": "0.0.202",
+	"version": "0.0.204",
 	"engines": {
 		"vscode": "^1.56.0"
 	},
@@ -63,7 +63,7 @@
 			},
 			{
 				"command": "quickcd.open",
-				"title": "quickcd: open"
+				"title": "quickcd: open in VSCode"
 			},
 			{
 				"command": "quickcd.cd",
@@ -71,7 +71,7 @@
 			},
 			{
 				"command": "quickcd.openInVS",
-				"title": "quickcd: open in VS"
+				"title": "quickcd: open in VisualStudio"
 			},
 			{
 				"command": "quickcd.fileExplorer",
@@ -100,6 +100,10 @@
 						"DGTAddress": {
 							"type": "string",
 							"default": ""
+						},
+						"cmdPath": {
+							"type": "string",
+							"default": "C:\\Windows\\System32\\cmd.exe"
 						}
 					}
 				}

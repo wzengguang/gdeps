@@ -158,7 +158,6 @@ export class OpenFileManager {
     }
 
     private creatNamedTerminal(name: string) {
-
         const existT = vscode.window.activeTerminal?.name;
         if (existT && existT != 'defaultPath') {
             vscode.window.activeTerminal?.dispose();
@@ -169,14 +168,15 @@ export class OpenFileManager {
             return;
         }
 
-
         const dir = this._config[name];
         if (!fs.existsSync(dir)) {
             vscode.window.showInformationMessage("Can't create terminal. path:" + dir + " is not exist.");
             return;
         }
 
-        var terminal = vscode.window.createTerminal(name);
+        var cmdPath = this._config["cmdPath"] || "C:\\Windows\\System32\\cmd.exe";
+
+        var terminal = vscode.window.createTerminal(name, cmdPath);
         var cmd = "SET INETROOT=" + dir + "&cd /d " + dir + "&gvfs mount&" + dir + "\\tools\\path1st\\myenv.cmd";
         terminal.show();
         terminal.sendText(cmd);
