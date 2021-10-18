@@ -79,17 +79,14 @@ export class OpenFileManager {
     }
 
     public async cdDirectory() {
-        let physicDir = await this.getSelectedFilePhysicPath();
-        if (physicDir) {
-            let dir = physicDir;
-            fs.stat(physicDir, (e, s) => {
-                if (!s.isDirectory()) {
-                    dir = path.dirname(dir);
-                }
-                vscode.window.activeTerminal?.sendText("cd " + dir);
-            });
+        var paths = await this.getCsprojDirAndFold();
+        if (paths) {
+            vscode.window.activeTerminal?.sendText("cd " + paths[0]);
         }
+        return;
     }
+
+
 
     public loadConfig(): void {
         this._config = <any>vscode.workspace.getConfiguration("quickcd");
@@ -114,13 +111,41 @@ export class OpenFileManager {
         }
     }
 
-    public async openInVS() {
+    private async getCsprojDirAndFold(): Promise<string[] | undefined> {
         let physicDir = await this.getSelectedFilePhysicPath();
-        if (physicDir && physicDir.endsWith("proj")) {
-            let parent = path.dirname(physicDir);
-            vscode.window.activeTerminal?.sendText("cd " + parent);
-            vscode.window.activeTerminal?.sendText(physicDir.split(this.pathSep).pop() as string);
+        if (!physicDir || !fs.existsSync(physicDir)) {
+            return;
         }
+
+        let parent = fs.lstatSync(physicDir).isDirectory() ? physicDir : path.dirname(physicDir);
+        let fileName = physicDir.split(this.pathSep).pop() as string;
+
+        if (!physicDir.endsWith("proj")) {
+            let limit = 0;
+            while (!fileName.endsWith('proj') && limit < 4) {
+                fs.readdirSync(parent).forEach(file => {
+                    if (file.endsWith('proj')) {
+                        fileName = file;
+                    }
+                })
+                parent = fileName.endsWith('proj') ? parent : path.resolve(parent, '..');
+                limit++;
+            }
+        }
+
+        let result = [fileName.endsWith('proj') ? parent : physicDir, fileName];
+        return Promise.resolve(result);
+    }
+
+    public async openInVS() {
+
+        var paths = await this.getCsprojDirAndFold();
+
+        if (paths && fs.existsSync(path.join(paths[0], paths[1]))) {
+            vscode.window.activeTerminal?.sendText("cd " + paths[0]);
+            vscode.window.activeTerminal?.sendText(paths[1]);
+        }
+        return;
     }
 
     public async revealInFileExplorer() {
@@ -234,7 +259,7 @@ export class OpenFileManager {
         let selection = this.getSlection();
 
         if (!selection) {
-            vscode.window.showInformationMessage("Not select something.");
+            // vscode.window.showInformationMessage("Not select something.");
             return '';
         }
 

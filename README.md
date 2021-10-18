@@ -81,10 +81,3 @@ Microsoft.Exchange.Entities.OnlineMeetings.dll
 ## 自动扫描
 当你使用该插件的时候，每一天会自动扫描，重新生成vs-manifest.json。如果想手动扫描一次，请删掉文件。
 可以在配置文件中配置 autoScan=false,禁止自动扫描。
-
-# Links
-* [Marketplace](https://marketplace.visualstudio.com/items?itemName=alightwang.quickcd)
-* [Source Code](https://github.com/wzengguang/quickOpenFile)
-
-# License
-[Apache](https://github.com/emeraldwalk/vscode-runonsave/blob/master/LICENSE)
