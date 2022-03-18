@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
-import { OpenFileManager } from './openFileManager';
+import { OpenFileManager } from './OpenFileManager';
 
 export function activate(context: vscode.ExtensionContext) {
 	const manager = new OpenFileManager();
@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.window.onDidChangeActiveTerminal(e => {
-		manager.changeTerminal(e);
+		//manager.changeTerminal(e);
 	});
 
 	vscode.window.onDidCloseTerminal(e => {
